@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<level-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:maxLevel="00">
+        <shape>
+            <stroke android:width="1px" android:color="#000000" />
+            <corners android:radius="5dp" />
+        </shape>
+    </item>
+    <item android:maxLevel="01">
+        <shape>
+            <stroke android:width="1px" android:color="#FF0000" />
+            <corners android:radius="5dp" />
+        </shape>
+    </item>
+    <item android:maxLevel="02">
+        <shape>
+            <stroke android:width="1px" android:color="#888888" />
+            <corners android:radius="5dp" />
+        </shape>
+    </item>
+    <item android:maxLevel="10">
+        <shape>
+            <stroke android:width="4px" android:color="#000000" />
+            <corners android:radius="5dp" />
+        </shape>
+    </item>
+     <item android:maxLevel="11">
+        <shape>
+            <stroke android:width="4px" android:color="#FF0000" />
+            <corners android:radius="5dp" />
+        </shape>
+    </item>
+     <item android:maxLevel="12">
+        <shape>
+            <stroke android:width="4px" android:color="#888888" />
+            <corners android:radius="5dp" />
+        </shape>
+    </item>
+</level-list>

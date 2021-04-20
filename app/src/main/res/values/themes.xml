@@ -1,0 +1,5 @@
+<resources>
+    <style name="Theme.MisesKeyGenius" parent="android:Theme">
+        <item name="android:textColor">#000</item>
+    </style>
+</resources>

@@ -1,0 +1,290 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    tools:context=".MainActivity">
+
+    <!-- global layout -->
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
+        android:paddingTop="10dp"
+        android:paddingBottom="10dp"
+        android:background="@color/white"
+        android:textColor="@color/black"
+        >
+
+        <!-- input panel -->
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:paddingTop="10dp"
+            android:paddingBottom="0dp"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
+            android:background="@color/light_blue">
+
+            <com.miseskeygenius.SpinnerLabel
+                android:id="@+id/modeSpinner"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                app:label="Input mode"
+                app:items="Mnemonics,Passphrase,Mnemonics + Passphrase,Seed,Master Private Key"
+                app:backgroundColor="@color/light_blue"
+                />
+
+            <com.miseskeygenius.EditTextLabel
+                android:id="@+id/mnemonicsBox"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                app:label="Mnemonics"
+                app:hint="enter your word list"
+                app:backgroundColor="@color/light_blue"
+                />
+
+            <com.miseskeygenius.EditTextLabel
+                android:id="@+id/passphraseBox"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                app:label="BIP39 Passphrase"
+                app:hint="Enter your passphrase"
+                app:backgroundColor="@color/light_blue"
+                android:visibility="gone"
+                />
+
+            <com.miseskeygenius.EditTextLabel
+                android:id="@+id/seedBox"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                app:label="Seed"
+                app:hint="hexadecimal chars"
+                app:backgroundColor="@color/light_blue"
+                android:visibility="gone"
+                />
+
+            <com.miseskeygenius.EditTextLabel
+                android:id="@+id/mpkBox"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                app:label="Master Private Key"
+                app:hint="xprv"
+                app:backgroundColor="@color/light_blue"
+                android:visibility="gone"
+                />
+
+        </LinearLayout>
+
+        <!-- gray panel -->
+        <LinearLayout
+            android:id="@+id/grayPanel"
+            android:orientation="vertical"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:paddingTop="10dp"
+            android:paddingBottom="10dp"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
+            android:background="@color/light_purple"
+            >
+
+            <!-- gray switch panel-->
+            <RelativeLayout
+                android:id="@+id/graySwitchPanel"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingTop="5dp"
+                android:paddingBottom="5dp"
+                android:gravity="center_vertical"
+                android:clickable="true"
+                android:focusable="true">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentLeft="true"
+                    android:layout_centerVertical="true"
+                    android:textColor="@color/black"
+                    android:text="Show advanced data"
+                    />
+
+                <!-- gray switch layout -->
+                <LinearLayout
+                    android:id="@+id/graySwitchLayout"
+                    android:layout_width="50dp"
+                    android:layout_height="20dp"
+                    android:layout_alignParentRight="true"
+                    >
+
+                    <Button
+                        android:id="@+id/sekizbit_switch_left"
+                        android:layout_width="fill_parent"
+                        android:layout_height="fill_parent"
+                        android:layout_weight="1"
+                        android:background="@drawable/sekizbit_selector_left"
+                        android:text="No"
+                        android:textSize="12sp"
+                        android:textColor="@drawable/sekizbit_selector_text_color"/>
+
+                    <Button
+                        android:id="@+id/sekizbit_switch_right"
+                        android:layout_width="fill_parent"
+                        android:layout_height="fill_parent"
+                        android:textColor="@drawable/sekizbit_selector_text_color"
+                        android:text="Yes"
+                        android:textSize="12sp"
+                        android:background="@drawable/sekizbit_selector_right"
+                        android:layout_weight="1"/>
+                </LinearLayout>
+            </RelativeLayout>
+
+            <!-- gray hidden layout -->
+            <LinearLayout
+                android:id="@+id/grayHiddenLayout"
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                >
+
+                <com.miseskeygenius.EditTextLabel
+                    android:id="@+id/graySeedBox"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="10dp"
+                    app:label="Seed"
+                    app:hint="hexadecimal chars"
+                    app:backgroundColor="@color/light_purple"
+                    app:disable="true"
+                    />
+
+                <com.miseskeygenius.EditTextLabel
+                    android:id="@+id/grayMpkBox"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="10dp"
+                    app:label="Master Private Key"
+                    app:hint="xprv"
+                    app:backgroundColor="@color/light_purple"
+                    app:disable="true"
+                    />
+
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- last options panel -->
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:paddingTop="10dp"
+            android:paddingBottom="0dp"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
+            android:background="@color/light_turquoise"
+            >
+
+            <com.miseskeygenius.SpinnerLabel
+                android:id="@+id/coinSpinner"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                app:label="Coin"
+                app:items="Bitcoin Legacy,Bitcoin Segwit,Ethereum"
+                app:backgroundColor="@color/light_turquoise"
+                />
+
+            <com.miseskeygenius.SpinnerLabel
+                android:id="@+id/ppKeySpinner"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                app:label="Private or Public"
+                app:items="Private,Public"
+                app:backgroundColor="@color/light_turquoise"
+                />
+
+            <com.miseskeygenius.EditableSpinnerLabel
+                android:id="@+id/pathBox"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                app:label="Path"
+                app:items="BIP32,BIP44,BIP49,BIP84"
+                app:itemValues="m/0'/0/i,m/44'/0'/0'/0/i,m/49'/0'/0'/0/i,m/84'/0'/0'/0/i"
+                app:hint="m/i'"
+                app:backgroundColor="@color/light_turquoise"
+                />
+
+            <com.miseskeygenius.EditTextLabel
+                android:id="@+id/addressNumberBox"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                app:label="Address number 'i' from-to: (max 54)"
+                app:hint="0-0"
+                app:backgroundColor="@color/light_turquoise"
+                />
+
+        </LinearLayout>
+
+        <!-- results panel -->
+        <LinearLayout
+            android:id="@+id/derivationResultsLayout"
+            android:orientation="vertical"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="10dp"
+            android:paddingBottom="0dp"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
+            android:background="@color/white"
+            >
+
+            <TextView
+                android:id="@+id/keyDescriptionBox"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:text="Mises Key Genius"
+                />
+
+            <ImageView
+                android:id="@+id/qrImageView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginBottom="10dp"
+                android:adjustViewBounds="true"
+                android:visibility="gone" />
+
+            <TextView
+                android:id="@+id/keyBox"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:typeface="monospace"
+                android:layout_marginBottom="10dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:ellipsize="end"
+                android:singleLine="false"
+                android:visibility="gone"
+                />
+        </LinearLayout>
+    </LinearLayout>
+</ScrollView>

@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <attr name="label" format="string" />
+    <attr name="backgroundColor" format="color" />
+    <attr name="hint" format="string" />
+    <attr name="text" format="string" />
+    <attr name="items" format="string" />
+    <attr name="itemValues" format="string" />
+    <attr name="disable" format="boolean" />
+
+    <declare-styleable name="EditTextLabel">
+        <attr name="label" />
+        <attr name="backgroundColor" />
+        <attr name="text" />
+        <attr name="hint" />
+        <attr name="disable" />
+    </declare-styleable>
+
+    <declare-styleable name="EditableSpinnerLabel">
+        <attr name="label" />
+        <attr name="backgroundColor" />
+        <attr name="text" />
+        <attr name="items" />
+        <attr name="itemValues" />
+        <attr name="hint" />
+    </declare-styleable>
+
+    <declare-styleable name="SpinnerLabel">
+        <attr name="label" />
+        <attr name="backgroundColor" />
+        <attr name="items" />
+    </declare-styleable>
+</resources>

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+
+    <color name="light_blue">#FFDDEEFF</color>
+    <color name="light_purple">#FFF5DDFF</color>
+    <color name="light_turquoise">#FFd5F5F5</color>
+
+    <color name="sekizbit_switch_background">#294A6D</color>
+    <color name="sekizbit_switch_stroke">#294A6D</color>
+    <color name="sekizbit_switch_thumb">#ffffff</color>
+    <color name="sekizbit_switch_text_selected">@color/black</color>
+    <color name="sekizbit_switch_text_unselected">@color/white</color>
+</resources>
