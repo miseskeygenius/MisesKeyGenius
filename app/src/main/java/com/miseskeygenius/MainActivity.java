@@ -20,11 +20,7 @@ import android.widget.Toast;
 import com.qrcode.ErrorCorrectionLevel;
 import com.qrcode.QRCode;
 
-import static com.miseskeygenius.MisesBip32.BITCOIN_LEGACY;
-import static com.miseskeygenius.MisesBip32.BITCOIN_SEGWIT;
 import static com.miseskeygenius.MisesBip32.ETHEREUM;
-import static com.miseskeygenius.MisesBip32.PRIVATE_KEY;
-import static com.miseskeygenius.MisesBip32.PUBLIC_ADDRESS;
 import static com.miseskeygenius.MisesBip32.generateSeed;
 import static com.miseskeygenius.MisesBip32.getMasterPrivateKey;
 import static com.miseskeygenius.MisesBip32.mnemonicsOk;
@@ -64,7 +60,7 @@ public class MainActivity extends Activity
 
     private SpinnerLabel coinSpinner;
     private EditableSpinnerLabel pathBox;
-    private EditTextLabel addressNumberBox;
+    private EditTextLabel keyNumberBox;
     private SpinnerLabel ppKeySpinner;
 
     private TextView keyDescriptionBox;
@@ -101,7 +97,7 @@ public class MainActivity extends Activity
         coinSpinner = findViewById(R.id.coinSpinner);
         pathBox = findViewById(R.id.pathBox);
         pathBox.hideText();
-        addressNumberBox = findViewById(R.id.addressNumberBox);
+        keyNumberBox = findViewById(R.id.keyNumberBox);
         ppKeySpinner = findViewById(R.id.ppKeySpinner);
 
         keyDescriptionBox = findViewById(R.id.keyDescriptionBox);
@@ -113,7 +109,7 @@ public class MainActivity extends Activity
         String seed = "F3E88F40D6D94FAFCB184A9994970A0F48B1C0D00292E3471D36A0F83F7ABF0812E69EA0E0BB122339341F019E5DEAB36CA07CF655B28EAB11A7B1347D26F85A";
         String mpk = "xprv9s21ZrQH143K4H9nJinLQoUZf2vwfnKNcrgegdSpDp4tSmpQFHFjfo4QuLCu24ysYoXgQasgkQrqJMgn3E8rap5KbyNU5yvEawn1gFiJGjV";
         String path = "m/0'/0/i'";
-        String addressNumbers = "0-0";
+        String keyNumbers = "0-0";
 
         mode = 0;
         mnemonicsBox.setText(mnemonics);
@@ -123,8 +119,8 @@ public class MainActivity extends Activity
         graySeedBox.setText(seed);
         grayMpkBox.setText(mpk);
         pathBox.setText(path);
-        addressNumberBox.setText(addressNumbers);
-        misesBip32 = new MisesBip32(mpk, path, addressNumbers);
+        keyNumberBox.setText(keyNumbers);
+        misesBip32 = new MisesBip32(mpk, path, keyNumbers);
 
         // set listeners for view objects
         modeSpinner.setOnItemSelectedListener(modeSpinnerListener);
@@ -137,7 +133,7 @@ public class MainActivity extends Activity
         grayMpkBox.addTextChangedListener(grayMpkBoxWatcher);
         coinSpinner.setOnItemSelectedListener(coinSpinnerListener);
         pathBox.addTextChangedListener(pathBoxWatcher);
-        addressNumberBox.addTextChangedListener(addressNumberBoxWatcher);
+        keyNumberBox.addTextChangedListener(keyNumberBoxWatcher);
         ppKeySpinner.setOnItemSelectedListener(ppKeySpinnerListener);
         qrImageView.setOnClickListener(qrImageListener);
         keyBox.setOnClickListener(keyBoxListener);
@@ -266,14 +262,14 @@ public class MainActivity extends Activity
         }
     };
 
-    // Listener for address number Box
-    private final TextWatcher addressNumberBoxWatcher = new TextWatcher() {
+    // Listener for key number Box
+    private final TextWatcher keyNumberBoxWatcher = new TextWatcher() {
 
         public void afterTextChanged(Editable s) { }
         public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
 
-        public void onTextChanged(CharSequence addressNumber, int start, int before, int count) {
-            addressNumberBoxChanged(addressNumber.toString());
+        public void onTextChanged(CharSequence keyNumber, int start, int before, int count) {
+            keyNumberBoxChanged(keyNumber.toString());
         }
     };
 
@@ -401,7 +397,7 @@ public class MainActivity extends Activity
 
         if (!inputSeedOk()) ok = false;
         else if (pathBox.isWrong()) ok = false;
-        else if (misesBip32.lookForAddresses & addressNumberBox.isWrong()) ok = false;
+        else if (misesBip32.searchKeys & keyNumberBox.isWrong()) ok = false;
 
         return ok;
     }
@@ -536,21 +532,18 @@ public class MainActivity extends Activity
 
         misesBip32.coin=coin;
 
-        updateAddressNumberLayout();
+        updateKeyNumberLayout();
         processDerivation();
     }
     
     // when path changes ...
     private void pathBoxChanged(String path) {
 
-        //boolean oldLook = misesBip32.lookForAddresses;
         boolean ok = misesBip32.setPath(path);
 
         if (ok) {
             pathBox.setCorrect(true);
-            updateAddressNumberLayout();
-            // if changed between addresses and extended key...
-            //if (misesBip32.lookForAddresses==!oldLook) updateppKeySpinner();
+            updateKeyNumberLayout();
             processDerivation();
         }
         else {
@@ -561,7 +554,7 @@ public class MainActivity extends Activity
     }
 
     private void updateppKeySpinner() {
-        if (misesBip32.lookForAddresses) ppKeySpinner.setItems("Private WIF,Private Ethereum,Public Legacy,Public SegWit,Public Ethereum", this);
+        if (misesBip32.searchKeys) ppKeySpinner.setItems("Private WIF,Private Ethereum,Public Legacy,Public SegWit,Public Ethereum", this);
         else ppKeySpinner.setItems("Private Legacy xPrv,Public Legacy xPub,Private Segwit zPrv,Public Segwit zPub", this);
     }
 
@@ -569,41 +562,46 @@ public class MainActivity extends Activity
 
         misesBip32.setPpKey(position);
 
-        updateAddressNumberLayout();
+        updateKeyNumberLayout();
         processDerivation();
     }
 
-    // when address numbers changes ...
-    private void addressNumberBoxChanged(String string) {
+    // when key numbers changes ...
+    private void keyNumberBoxChanged(String string) {
 
-        boolean ok = misesBip32.setAddressNumbers(string);
+        boolean ok = misesBip32.setKeyNumbers(string);
 
         if (ok) {
-            addressNumberBox.setCorrect(true);
+            keyNumberBox.setCorrect(true);
             processDerivation();
         }
         else {
             if (derivationThread != null) derivationThread.interrupt();
-            addressNumberBox.setCorrect(false);
+            keyNumberBox.setCorrect(false);
             setStatus("ERROR", null);
         }
     }
     
-    private void updateAddressNumberLayout()
+    private void updateKeyNumberLayout()
     {
-        if (misesBip32.lookForAddresses) {
-            // update address letter
+        if (misesBip32.searchKeys) {
+            // update variable for key
             String path = pathBox.getText();
-            char addressLetter = path.charAt(path.length()-1);
-            if (addressLetter=='\'' | addressLetter=='H') addressLetter = path.charAt(path.length()-2);
+            char keyLetter = path.charAt(path.length()-1);
+            if (keyLetter =='\'' | keyLetter =='H') keyLetter = path.charAt(path.length()-2);
 
-            // update max number of addresses text
-            int maxNAdresses = misesBip32.getMaxNAdresses();
+            // update max number of keys text
+            int maxNKeys = misesBip32.getMaxNKeys();
 
-            addressNumberBox.setVisibility(View.VISIBLE);
-            addressNumberBox.setLabel("Address number '" + addressLetter + "' from-to: (max " + maxNAdresses + ")");
+            // address or key ?
+            String keyType;
+            if (misesBip32.isPrivateKey()) keyType = "Key";
+            else  keyType = "Address";
+
+            keyNumberBox.setVisibility(View.VISIBLE);
+            keyNumberBox.setLabel(keyType + " number '" + keyLetter + "' from-to: (max " + maxNKeys + ")");
         }
-        else addressNumberBox.setVisibility(View.GONE);
+        else keyNumberBox.setVisibility(View.GONE);
     }
 
     private void qrImageClicked(){
@@ -667,25 +665,29 @@ public class MainActivity extends Activity
             else pp = "Public";
 
             String coin;
-            if (misesBip32.coin==BITCOIN_LEGACY) coin = "Bitcoin Legacy";
-            else if (misesBip32.coin==BITCOIN_SEGWIT) coin = "Bitcoin Segwit";
-            else coin = "Ethereum";
+            if (misesBip32.coin==ETHEREUM) coin = "Ethereum";
+            else coin = "Bitcoin";
 
             int nKeys = misesBip32.getNAdresses();
 
-            String description;
+            String description = new String();
 
-            if (misesBip32.lookForAddresses)
+            if (misesBip32.searchKeys)
             {
-                if (nKeys>1) description = nKeys + " " + coin + " " + pp + " Addresses";
-                else description = coin + " " + pp + " Address";
+                if (nKeys>1) description += nKeys;
+                description += " " + coin + " " + pp + " ";
+
+                if (misesBip32.isPrivateKey() & nKeys>1) description += "keys";
+                else if (misesBip32.isPrivateKey()) description += "key";
+                else if (nKeys>1) description += "addresses";
+                else  description += "address";
             }
             else description = "Extended " + pp + " Key";
 
             keyDescriptionBox.setText(description);
             qrImageView.setImageBitmap(bitmap);
 
-            if (misesBip32.lookForAddresses) keyBox.setText(misesBip32.keyListNumbers);
+            if (misesBip32.searchKeys) keyBox.setText(misesBip32.keyListNumbers);
             else keyBox.setText(misesBip32.keyList);
 
             qrImageView.setVisibility(View.VISIBLE);

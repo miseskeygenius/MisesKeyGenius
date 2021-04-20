@@ -24,19 +24,19 @@ public class MisesBip32  {
       // INPUT
     private DeterministicKey masterPrivateKey;
     private String path;
-    private int addressFrom;
-    private int addressTo;
-    public boolean lookForAddresses;
+    private int keyFrom;
+    private int keyTo;
+    public boolean searchKeys;
 
     public boolean inputOk()
     {
-        return masterPrivateKey!=null & path!=null & addressFrom>=0 & addressFrom<=addressTo;
+        return masterPrivateKey!=null & path!=null & keyFrom >=0 & keyFrom <= keyTo;
     }
 
     // is the key public or private?
     private int ppKey;
     public static final int PRIVATE_KEY = 0;
-    public static final int PUBLIC_ADDRESS = 1;
+    public static final int PUBLIC_KEY = 1;
 
     public int coin;
     public static final int BITCOIN_LEGACY = 0;
@@ -47,11 +47,11 @@ public class MisesBip32  {
     public String keyList;
     public String keyListNumbers;
 
-    public MisesBip32(String mpk, String path, String addressNumbers)
+    public MisesBip32(String mpk, String path, String keyNumbers)
     {
         setMasterPrivateKey(mpk);
         setPath(path);
-        setAddressNumbers(addressNumbers);
+        setKeyNumbers(keyNumbers);
     }
 
     public static String generateSeed(String mnemonics, String passphrase, int mode) {
@@ -103,8 +103,8 @@ public class MisesBip32  {
         boolean ok = pathOk(path);
         if (ok) {
             this.path = path;
-            // tells if we are looking for an extended key, or addresses
-            lookForAddresses = path.matches("[Mm]/.*[a-z].*");
+            // tells if we have to search for keys from the extended key
+            searchKeys = path.matches("[Mm]/.*[a-z].*");
         }
         return ok;
     }
@@ -113,21 +113,21 @@ public class MisesBip32  {
         return path.matches("[mM](/[0-9]+['H]?)*(/([a-z]['H]?)?)?");
     }
 
-    public boolean setAddressNumbers(String string) {
+    public boolean setKeyNumbers(String string) {
 
         boolean ok = false;
         if (string.matches("[0-9]+-[0-9]+")) {
 
-            this.addressFrom = Integer.parseInt(string.substring(0, string.indexOf('-')));
-            this.addressTo = Integer.parseInt(string.substring(string.indexOf('-') + 1));
+            this.keyFrom = Integer.parseInt(string.substring(0, string.indexOf('-')));
+            this.keyTo = Integer.parseInt(string.substring(string.indexOf('-') + 1));
 
-            ok = addressFrom>=0 & addressFrom<=addressTo;
+            ok = keyFrom >=0 & keyFrom <= keyTo;
         }
         else if (string.matches("[0-9]+")) {
-            this.addressFrom = Integer.parseInt(string);
-            this.addressTo = this.addressFrom;
+            this.keyFrom = Integer.parseInt(string);
+            this.keyTo = this.keyFrom;
 
-            ok = addressFrom>=0;
+            ok = keyFrom >=0;
         }
         return ok;
     }
@@ -135,12 +135,12 @@ public class MisesBip32  {
     public int getNAdresses(){
 
         int nAdresses;
-        if (!lookForAddresses) nAdresses=1;
+        if (!searchKeys) nAdresses=1;
 
         else {
-            nAdresses = addressTo - addressFrom + 1;
+            nAdresses = keyTo - keyFrom + 1;
             if (nAdresses>1){
-                int maxNAdresses = getMaxNAdresses();
+                int maxNAdresses = getMaxNKeys();
                 if (nAdresses>maxNAdresses) nAdresses = maxNAdresses;
             }
         }
@@ -154,7 +154,7 @@ public class MisesBip32  {
     private static final int prvEthKeySize = 66;
     private static final int ethAddressSize = 42;
 
-    private int getAddressLength()
+    private int getKeyLength()
     {
         int result;
         if (coin==BITCOIN_LEGACY) {
@@ -173,11 +173,11 @@ public class MisesBip32  {
     }
 
 
-    // fix num of addresses according to max QR capacity
-    public int getMaxNAdresses() {
+    // fix num of keys according to max QR capacity
+    public int getMaxNKeys() {
 
         int maxLength = QRCode.getMaxLength(Mode.MODE_8BIT_BYTE, ErrorCorrectionLevel.L);
-        return (maxLength/(getAddressLength()+2))-1;
+        return (maxLength/(getKeyLength()+2))-1;
     }
 
     public void setPpKey(int pp) { this.ppKey=pp; }
@@ -197,47 +197,46 @@ public class MisesBip32  {
             return;
         }
 
-        boolean hardenedAddresses = path.endsWith("'") | path.endsWith("H");
+        boolean hardenedKeys = path.endsWith("'") | path.endsWith("H");
 
         String extendedKeyPath = path;
 
-        if (lookForAddresses)
+        if (searchKeys)
             // remove everything after last '/'
             if (path.lastIndexOf('/')!=-1) extendedKeyPath = path.substring(0, path.lastIndexOf('/'));
 
         DeterministicKey extendedKey = DeterministicKey.computeDerivation(this.masterPrivateKey, extendedKeyPath);
 
-        if (lookForAddresses) {
+        if (searchKeys) {
 
-            // get addresses from extendedKey
-            // convert key dk to WIF format
+            // get keys from extendedKey
 
-            int addressLength = getAddressLength();
-            int nAddresses = getNAdresses();
+            int keyLength = getKeyLength();
+            int nKeys = getNAdresses();
 
-            StringBuilder keyBuffer = new StringBuilder(addressLength*nAddresses);
-            StringBuilder numbersBuffer = new StringBuilder(addressLength*nAddresses);
+            StringBuilder keyBuffer = new StringBuilder(keyLength * nKeys);
+            StringBuilder numbersBuffer = new StringBuilder(keyLength * nKeys);
 
 
-            for (int i = 0; i<nAddresses & carryOn(); i++) {
+            for (int i = 0; i< nKeys & carryOn(); i++) {
 
-                int a = addressFrom+i;
-                String addressPath = "m/" + a;
-                if (hardenedAddresses) addressPath += "H";
+                int a = keyFrom +i;
+                String currentPath = "m/" + a;
+                if (hardenedKeys) currentPath += "H";
 
-                DeterministicKey addressKey = DeterministicKey.computeDerivation(extendedKey, addressPath);
+                DeterministicKey dKey = DeterministicKey.computeDerivation(extendedKey, currentPath);
 
                 String key;
 
                 if (isPrivateKey()) {
-                    if (coin==ETHEREUM) key = getEthPrvKey(addressKey);
-                    else key = getBtcPrvKey(addressKey);
+                    if (coin==ETHEREUM) key = getEthPrvKey(dKey);
+                    else key = getBtcPrvKey(dKey);
                 }
-                else // public address
+                else // public key
                 {
-                    if (coin==BITCOIN_LEGACY) key = getLegacyAddress(addressKey);
-                    else if (coin==BITCOIN_SEGWIT) key = getSegwitAddress(addressKey);
-                    else key = getEthereumAddress(addressKey);
+                    if (coin==BITCOIN_LEGACY) key = getLegacyAddress(dKey);
+                    else if (coin==BITCOIN_SEGWIT) key = getSegwitAddress(dKey);
+                    else key = getEthereumAddress(dKey);
                 }
 
                 keyBuffer.append(key);
@@ -245,7 +244,7 @@ public class MisesBip32  {
 
                 numbersBuffer.append(a).append(": ");
                 if (a<10) numbersBuffer.append(" ");
-                if (key.length()<addressLength) numbersBuffer.append(String.format("%" + addressLength + "s", key));
+                if (key.length()< keyLength) numbersBuffer.append(String.format("%" + keyLength + "s", key));
                 else numbersBuffer.append(key);
                 numbersBuffer.append("\n");
             }

@@ -232,11 +232,11 @@
                 />
 
             <com.miseskeygenius.EditTextLabel
-                android:id="@+id/addressNumberBox"
+                android:id="@+id/keyNumberBox"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="10dp"
-                app:label="Address number 'i' from-to: (max 54)"
+                app:label="Key number 'i' from-to: (max 53)"
                 app:hint="0-0"
                 app:backgroundColor="@color/light_turquoise"
                 />
