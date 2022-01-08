@@ -17,8 +17,14 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bitcoinj.Dictionary;
+import com.bitcoinj.MnemonicCode;
 import com.qrcode.ErrorCorrectionLevel;
 import com.qrcode.QRCode;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 import static com.miseskeygenius.MisesBip32.ETHEREUM;
 import static com.miseskeygenius.MisesBip32.generateSeed;
@@ -145,6 +151,170 @@ public class MainActivity extends Activity
         maxQRsize = width;
         if (height < width) maxQRsize = height;
         maxQRsize -= grayPanel.getPaddingLeft() * 4;
+
+
+
+
+        System.out.println("-----------------------------------------------");
+        searchInLines(">2 Book", true, 2, Book.lines);
+        searchInLines("=3 Book", false, 3, Book.lines);
+        searchInLines(">3 Book", true, 3, Book.lines);
+        searchInLines("=4 Book", false, 4, Book.lines);
+        searchInLines(">4 Book", true, 4, Book.lines);
+        searchInLines("=5 Book", false, 5, Book.lines);
+        searchInLines(">5 Book", true, 5, Book.lines);
+        System.out.println("-----------------------------------------------");
+
+
+    }
+
+   private static final int INVALID_WORDS = 0;
+
+    private void searchInLines(String book, boolean higher, int wordSize, String[] lines)
+    {
+        int lineNum = 1;
+        for (String line : lines)
+        {
+            String words[] = line.split(" ");
+
+            int invalidWords = 0;
+
+            List<String> words4 = new ArrayList<>();
+
+            for (String word : words) {
+
+                boolean check;
+                if (higher) check = word.length() > wordSize;
+                else check = word.length() == wordSize;
+
+                if (check) {
+                    if (Collections.binarySearch(Dictionary.english, word) < 0) break;
+                    if (words4.size()<4) words4.add(word);
+                    if (words4.size()>=4) break;
+                }
+                else invalidWords++;
+            }
+
+            if (words4.size()==4 & invalidWords<=INVALID_WORDS) {
+
+
+                // look for next 4 words
+                int lineNum2 = 1;
+                for (String line2 : lines)
+                {
+                    if (lineNum2 >lineNum)
+                    {
+                        String words2[] = line2.split(" ");
+                        List<String> words8 = new ArrayList<>();
+                        words8.addAll(words4);
+
+                        int shortWords2 = 0;
+
+                        for (String word : words2) {
+
+                            boolean check;
+                            if (higher) check = word.length() > wordSize;
+                            else check = word.length() == wordSize;
+
+                            if (check) {
+                                if (Collections.binarySearch(Dictionary.english, word) < 0) break;
+                                if (words8.size()<8) words8.add(word);
+                                if (words8.size()>=8) break;
+                             }
+                            else shortWords2++;
+                        }
+
+                        if (words8.size()==8 & shortWords2 <=INVALID_WORDS) {
+
+                            // look for last 4 words
+                            int lineNum3 = 1;
+                            for (String line3 : lines)
+                            {
+                                if (lineNum3 > lineNum2)
+                                {
+                                    String words3[] = line3.split(" ");
+                                    List<String> words12 = new ArrayList<>();
+                                    words12.addAll(words8);
+
+                                    int shortWords3 = 0;
+
+                                    for (String word : words3)
+                                    {
+                                        boolean check;
+                                        if (higher) check = word.length() > wordSize;
+                                        else check = word.length() == wordSize;
+
+                                        if (check) {
+                                            if (Collections.binarySearch(Dictionary.english, word) < 0) break;
+                                            if (words12.size()<12) words12.add(word);
+                                            if (words12.size()>=12) break;
+                                        }
+                                        else shortWords3++;
+                                    }
+
+                                    if (words12.size()==12 & MnemonicCode.checkMnemonics(words12) & shortWords3 <=INVALID_WORDS)
+                                    {
+                                        // first 4 words
+                                        System.out.println(book+" lineNum: " + lineNum + " - invalidWords: " + invalidWords);
+
+                                        // brackets line
+                                        for (String word : words) {
+                                            boolean insideDictionary = Collections.binarySearch(Dictionary.english, word) >= 0;
+                                            if (higher) {
+                                                if (word.length()>wordSize & insideDictionary) System.out.print("["+ word +"] ");
+                                                else System.out.print(word +" ");
+                                            }
+                                            else {
+                                                if (word.length()==wordSize & insideDictionary) System.out.print("["+ word +"] ");
+                                                else System.out.print(word +" ");
+                                            }
+                                        }
+                                        System.out.println();
+
+                                        // next 4 words
+                                        System.out.println(book+" lineNum: " + lineNum2 + " - invalidWords: " + shortWords2);
+
+                                        // brackets line
+                                        for (String word : words2) {
+                                            boolean insideDictionary = Collections.binarySearch(Dictionary.english, word) >= 0;
+                                            if (higher) {
+                                                if (word.length()>wordSize & insideDictionary) System.out.print("["+ word +"] ");
+                                                else System.out.print(word +" ");
+                                            }
+                                            else {
+                                                if (word.length()==wordSize & insideDictionary) System.out.print("["+ word +"] ");
+                                                else System.out.print(word +" ");
+                                            }
+                                        }
+                                        System.out.println();
+
+                                        // last 4 words
+                                        System.out.println(book+" lineNum: " + lineNum3 + " - invalidWords: " + shortWords3);
+
+                                        // brackets line
+                                        for (String word : words3) {
+                                            boolean insideDictionary = Collections.binarySearch(Dictionary.english, word) >= 0;
+                                            if (higher) {
+                                                if (word.length()>wordSize & insideDictionary) System.out.print("["+ word +"] ");
+                                                else System.out.print(word +" ");
+                                            }
+                                            else {
+                                                if (word.length()==wordSize & insideDictionary) System.out.print("["+ word +"] ");
+                                                else System.out.print(word +" ");
+                                            }
+                                        }
+                                        System.out.println();
+                                    }
+                                }
+                                lineNum3++;
+                            }
+                        }
+                    }
+                    lineNum2++;
+                }
+            }
+            lineNum++;
+        }
     }
 
     // Listener for modeSpinner
