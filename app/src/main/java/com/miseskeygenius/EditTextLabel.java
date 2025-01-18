@@ -5,12 +5,6 @@ import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
-import android.graphics.drawable.DrawableContainer;
-import android.graphics.drawable.GradientDrawable;
-import android.graphics.drawable.StateListDrawable;
-import android.os.Build;
-import android.os.Bundle;
-import android.os.Parcelable;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
 import android.util.TypedValue;
@@ -27,7 +21,6 @@ public class EditTextLabel extends RelativeLayout {
     private TextView textView;
     private EditText editText;
     private boolean isCorrect = true;
-    private boolean isDisabled = false;
 
     public EditTextLabel(Context context, AttributeSet attrs, int defStyle)
     {
@@ -92,7 +85,7 @@ public class EditTextLabel extends RelativeLayout {
 
         textView.setLayoutParams(tvParams);
 
-        isDisabled = typedArray.getBoolean(R.styleable.EditTextLabel_disable, false) ;
+        boolean isDisabled = typedArray.getBoolean(R.styleable.EditTextLabel_disable, false);
         if (isDisabled) this.disable();
         else this.setCorrect(true);
 
@@ -103,9 +96,8 @@ public class EditTextLabel extends RelativeLayout {
     }
 
     public void setLabel(String text){ textView.setText(text); }
-    public String getLabel(){
-        return textView.getText().toString();
-    }
+    //public String getLabel() return textView.getText().toString();
+
     public void setText(String text){ editText.setText(text); }
     public String getText(){
         return editText.getText().toString();
@@ -158,7 +150,7 @@ public class EditTextLabel extends RelativeLayout {
         }
 
         // show toast
-        Toast.makeText(getContext().getApplicationContext(), "Copied to clipboard", Toast.LENGTH_SHORT).show();
+        Toast.makeText(getContext().getApplicationContext(), "Coooooopied to clipboard", Toast.LENGTH_SHORT).show();
     }
 
     private void setColor(int color)

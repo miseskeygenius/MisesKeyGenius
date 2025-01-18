@@ -1,5 +1,18 @@
 package com.miseskeygenius;
 
+/*
+    Android Studio
+
+    Disable suggestion "Anonymous [type] can be replaced with lambda" from settings:
+    File -> Settings -> Editor -> Inspections
+    Java -> Java language level migration aids -> Java 8
+
+    Generate APK:
+    Build -> Generate Signed APK -> Next -> release -> select V1 and V2 signatures -> Finish
+    Find APK in app/release/app-release.apk
+*/
+
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.ClipData;
 import android.content.res.Resources;
@@ -58,10 +71,8 @@ public class MainActivity extends Activity
     private EditTextLabel graySeedBox;
     private EditTextLabel grayMpkBox;
 
-    private SpinnerLabel coinSpinner;
     private EditableSpinnerLabel pathBox;
     private EditTextLabel keyNumberBox;
-    private SpinnerLabel ppKeySpinner;
 
     private TextView keyDescriptionBox;
     private ImageView qrImageView;
@@ -94,11 +105,11 @@ public class MainActivity extends Activity
         graySeedBox = findViewById(R.id.graySeedBox);
         grayMpkBox = findViewById(R.id.grayMpkBox);
 
-        coinSpinner = findViewById(R.id.coinSpinner);
+        SpinnerLabel coinSpinner = findViewById(R.id.coinSpinner);
         pathBox = findViewById(R.id.pathBox);
         pathBox.hideText();
         keyNumberBox = findViewById(R.id.keyNumberBox);
-        ppKeySpinner = findViewById(R.id.ppKeySpinner);
+        SpinnerLabel ppKeySpinner = findViewById(R.id.ppKeySpinner);
 
         keyDescriptionBox = findViewById(R.id.keyDescriptionBox);
         qrImageView = findViewById(R.id.qrImageView);
@@ -106,20 +117,30 @@ public class MainActivity extends Activity
 
         // initialization
         String mnemonics = "word word word word word word";
-        String seed = "F3E88F40D6D94FAFCB184A9994970A0F48B1C0D00292E3471D36A0F83F7ABF0812E69EA0E0BB122339341F019E5DEAB36CA07CF655B28EAB11A7B1347D26F85A";
-        String mpk = "xprv9s21ZrQH143K4H9nJinLQoUZf2vwfnKNcrgegdSpDp4tSmpQFHFjfo4QuLCu24ysYoXgQasgkQrqJMgn3E8rap5KbyNU5yvEawn1gFiJGjV";
-        String path = "m/0'/0/i'";
+        String seed = MisesBip32.generateSeed(mnemonics, "", MODE_MNEMONICS);
+        String mpk = MisesBip32.getMasterPrivateKey(seed);
+        String path = MisesBip32.paths[0][2].split(",")[0];
         String keyNumbers = "0-0";
+
+        // fill coin spinner with coin names
+        coinSpinner.setItems( new String[]{
+            MisesBip32.paths[0][0],
+            MisesBip32.paths[1][0],
+            MisesBip32.paths[2][0]
+        });
 
         mode = 0;
         mnemonicsBox.setText(mnemonics);
-        passphraseBox.setText("Enter your passphrase");
+        //passphraseBox.setText("Enter your passphrase");
         seedBox.setText(seed);
         mpkBox.setText(mpk);
         graySeedBox.setText(seed);
         grayMpkBox.setText(mpk);
-        pathBox.setText(path);
+        pathBox.itemValues = MisesBip32.paths[0][2].split(",");
+        pathBox.setText(pathBox.itemValues[0]);
+
         keyNumberBox.setText(keyNumbers);
+
         misesBip32 = new MisesBip32(mpk, path, keyNumbers);
 
         // set listeners for view objects
@@ -143,11 +164,9 @@ public class MainActivity extends Activity
         int width = Resources.getSystem().getDisplayMetrics().widthPixels;
         int height = Resources.getSystem().getDisplayMetrics().heightPixels;
         maxQRsize = width;
-        if (height < width) maxQRsize = height;
+        if (height < width) maxQRsize = height+1-1;
         maxQRsize -= grayPanel.getPaddingLeft() * 4;
     }
-
-   private static final int INVALID_WORDS = 0;
 
     // Listener for modeSpinner
     AdapterView.OnItemSelectedListener modeSpinnerListener= new AdapterView.OnItemSelectedListener() {
@@ -280,7 +299,7 @@ public class MainActivity extends Activity
         @Override
         public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
             // check if spinner item has been changed
-            if ((position==0)!=misesBip32.isPrivateKey()) {
+            if ((position==1)!=misesBip32.isPrivateKey()) {
                 ppKeySpinnerChanged(position);
             }
         }
@@ -360,7 +379,7 @@ public class MainActivity extends Activity
         grayMpkBox.setVisibility(grayMpkVisible);
     }
 
-    private boolean inputSeedOk()
+    private boolean inputSeedWrong()
     {
         boolean ok = true;
 
@@ -391,13 +410,13 @@ public class MainActivity extends Activity
                 // MODE_MPK
                 if (mpkBox.isWrong()) ok = false;
         }
-        return ok;
+        return !ok;
     }
 
     private boolean allInputsOk(){
         boolean ok = true;
 
-        if (!inputSeedOk()) ok = false;
+        if (inputSeedWrong()) ok = false;
         else if (pathBox.isWrong()) ok = false;
         else if (misesBip32.searchKeys & keyNumberBox.isWrong()) ok = false;
 
@@ -406,7 +425,7 @@ public class MainActivity extends Activity
 
     private void updategraySeed() {
 
-        if (!inputSeedOk()) setStatus("ERROR", null);
+        if (inputSeedWrong()) setStatus("ERROR", null);
         else
         {
             setStatus("PROCESSING", null);
@@ -531,11 +550,15 @@ public class MainActivity extends Activity
     }
 
     public void coinSpinnerChanged (int coin) {
+        if (coin!=misesBip32.coin) {
+            misesBip32.coin=coin;
 
-        misesBip32.coin=coin;
+            pathBox.setItems(MisesBip32.paths[coin][1], MisesBip32.paths[coin][2]);
 
-        updateKeyNumberLayout();
-        processDerivation();
+            // this will be called in pathBoxChanged
+            //updateKeyNumberLayout();
+            //processDerivation();
+        }
     }
     
     // when path changes ...
@@ -555,13 +578,12 @@ public class MainActivity extends Activity
         }
     }
 
-    private void updateppKeySpinner() {
-        if (misesBip32.searchKeys) ppKeySpinner.setItems("Private WIF,Private Ethereum,Public Legacy,Public SegWit,Public Ethereum", this);
-        else ppKeySpinner.setItems("Private Legacy xPrv,Public Legacy xPub,Private Segwit zPrv,Public Segwit zPub", this);
-    }
+    /*private void updateppKeySpinner() {
+        if (misesBip32.searchKeys) ppKeySpinner.setItems("Private WIF,Private Ethereum,Public Legacy,Public SegWit,Public Ethereum");
+        else ppKeySpinner.setItems("Private Legacy xPrv,Public Legacy xPub,Private Segwit zPrv,Public Segwit zPub");
+    }*/
 
     public void ppKeySpinnerChanged (int position) {
-
         misesBip32.setPpKey(position);
 
         updateKeyNumberLayout();
@@ -646,6 +668,7 @@ public class MainActivity extends Activity
         toast.show();
     }
 
+    @SuppressLint("SetTextI18n")
     void setStatus(String status, Bitmap bitmap) {
         if (status.equals("PROCESSING")) {
             keyDescriptionBox.setText("Processing...");
@@ -672,7 +695,7 @@ public class MainActivity extends Activity
 
             int nKeys = misesBip32.getNAdresses();
 
-            String description = new String();
+            String description = "";
 
             if (misesBip32.searchKeys)
             {
@@ -699,7 +722,7 @@ public class MainActivity extends Activity
 
     private void processDerivation()
     {
-        if (!allInputsOk() | !misesBip32.inputOk()) setStatus("ERROR", null);
+        if (!allInputsOk() | misesBip32.inputWrong()) setStatus("ERROR", null);
 
         else
         {

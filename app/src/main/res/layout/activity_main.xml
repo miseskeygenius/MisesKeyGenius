@@ -39,7 +39,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="10dp"
                 app:label="Input mode"
-                app:items="Mnemonics,Passphrase,Mnemonics + Passphrase,Seed,Master Private Key"
+                app:items="BIP39 Wordlist,BIP32 Passphrase,BIP39 Wordlist + Passphrase,Seed,Master Private Key"
                 app:backgroundColor="@color/light_blue"
                 />
 
@@ -48,7 +48,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="10dp"
-                app:label="Mnemonics"
+                app:label="BIP39 Wordlist"
                 app:hint="enter your word list"
                 app:backgroundColor="@color/light_blue"
                 />
@@ -119,8 +119,9 @@
                     android:layout_alignParentLeft="true"
                     android:layout_centerVertical="true"
                     android:textColor="@color/black"
-                    android:text="Show advanced data"
-                    />
+                    android:text="@string/show_advanced_data"
+                    android:layout_alignParentStart="true"
+                    tools:ignore="RelativeOverlap" />
 
                 <!-- gray switch layout -->
                 <LinearLayout
@@ -128,7 +129,7 @@
                     android:layout_width="50dp"
                     android:layout_height="20dp"
                     android:layout_alignParentRight="true"
-                    >
+                    android:layout_alignParentEnd="true">
 
                     <Button
                         android:id="@+id/sekizbit_switch_left"
@@ -136,7 +137,7 @@
                         android:layout_height="fill_parent"
                         android:layout_weight="1"
                         android:background="@drawable/sekizbit_selector_left"
-                        android:text="No"
+                        android:text="@string/no"
                         android:textSize="12sp"
                         android:textColor="@drawable/sekizbit_selector_text_color"/>
 
@@ -145,7 +146,7 @@
                         android:layout_width="fill_parent"
                         android:layout_height="fill_parent"
                         android:textColor="@drawable/sekizbit_selector_text_color"
-                        android:text="Yes"
+                        android:text="@string/yes"
                         android:textSize="12sp"
                         android:background="@drawable/sekizbit_selector_right"
                         android:layout_weight="1"/>
@@ -205,17 +206,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="10dp"
                 app:label="Coin"
-                app:items="Bitcoin Legacy,Bitcoin Segwit,Ethereum"
-                app:backgroundColor="@color/light_turquoise"
-                />
-
-            <com.miseskeygenius.SpinnerLabel
-                android:id="@+id/ppKeySpinner"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="10dp"
-                app:label="Private or Public"
-                app:items="Private,Public"
+                app:items=""
                 app:backgroundColor="@color/light_turquoise"
                 />
 
@@ -225,9 +216,19 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="10dp"
                 app:label="Path"
-                app:items="BIP32,BIP44,BIP49,BIP84"
-                app:itemValues="m/0'/0/i,m/44'/0'/0'/0/i,m/49'/0'/0'/0/i,m/84'/0'/0'/0/i"
+                app:items="BIP44,BIP32,MultiBit HD,Coinomi"
+                app:itemValues=""
                 app:hint="m/i'"
+                app:backgroundColor="@color/light_turquoise"
+                />
+
+            <com.miseskeygenius.SpinnerLabel
+                android:id="@+id/ppKeySpinner"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                app:label="Public or Private"
+                app:items="Public,Private"
                 app:backgroundColor="@color/light_turquoise"
                 />
 
@@ -236,7 +237,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="10dp"
-                app:label="Key number 'i' from-to: (max 53)"
+                app:label="Key number 'n' from-to: (max 53)"
                 app:hint="0-0"
                 app:backgroundColor="@color/light_turquoise"
                 />
@@ -261,7 +262,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="10dp"
-                android:text="Mises Key Genius"
+                android:text="@string/mises_key_genius"
                 />
 
             <ImageView
@@ -271,7 +272,8 @@
                 android:layout_gravity="center_horizontal"
                 android:layout_marginBottom="10dp"
                 android:adjustViewBounds="true"
-                android:visibility="gone" />
+                android:visibility="gone"
+                android:contentDescription="QR" />
 
             <TextView
                 android:id="@+id/keyBox"

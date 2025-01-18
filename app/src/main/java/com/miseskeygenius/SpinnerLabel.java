@@ -18,8 +18,9 @@ import android.widget.TextView;
 public class SpinnerLabel extends RelativeLayout {
 
     private RelativeLayout innerLayout;
-    private TextView textView;
-   private Spinner spinner;
+    private Spinner spinner;
+    private Context context;
+
     ArrayAdapter<String> adapter;
 
     public SpinnerLabel(Context context, AttributeSet attrs, int defStyle)
@@ -34,6 +35,8 @@ public class SpinnerLabel extends RelativeLayout {
 
     public void init(Context context, AttributeSet attrs)
     {
+        this.context=context;
+
         int dp5 = dpToPx(5, context);
         int dp10 = dpToPx(10, context);
         int dp40 = dpToPx(40, context);
@@ -63,7 +66,6 @@ public class SpinnerLabel extends RelativeLayout {
         imageView.setId(generateId());
         innerLayout.addView(imageView);
 
-
         // spinner
         spinner = new Spinner(context);
         spinner.setPadding(0, 0, 0, 0);
@@ -71,7 +73,7 @@ public class SpinnerLabel extends RelativeLayout {
         spinner.setBackgroundResource(0);
 
         String items = typedArray.getString(R.styleable.SpinnerLabel_items) ;
-        if (items != null) setItems(items, context);
+        if (items != null) setItems(items);
 
         LayoutParams spParams = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
         spParams.setMargins(0,0,0,0);
@@ -105,7 +107,7 @@ public class SpinnerLabel extends RelativeLayout {
         });
 
         // TextView
-        textView = new TextView(context);
+        TextView textView = new TextView(context);
         textView.setPadding(dp5, 0,dp5,0);
 
         String label = typedArray.getString(R.styleable.SpinnerLabel_label) ;
@@ -147,10 +149,8 @@ public class SpinnerLabel extends RelativeLayout {
         public void onNothingSelected(AdapterView<?> arg0) {}
     };
 
-    public void setLabel(String text){ textView.setText(text); }
-    public String getLabel(){
-        return textView.getText().toString();
-    }
+    //public void setLabel(String text){ textView.setText(text); }
+    //public String getLabel() return textView.getText().toString();
 
     public static int dpToPx(float dp, Context context) {
         return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, context.getResources().getDisplayMetrics());
@@ -177,8 +177,11 @@ public class SpinnerLabel extends RelativeLayout {
         return id;
     }
 
-    public void setItems(String items, Context context) {
-        String[] itemList = items.split(",");
+    public void setItems(String items) {
+        setItems(items.split(","));
+    }
+
+    public void setItems(String[] itemList) {
         // create an adapter to describe how the items are displayed
         adapter = new ArrayAdapter<>(context, R.layout.spinner_item, itemList);
         // set the spinners adapter to the previously created one

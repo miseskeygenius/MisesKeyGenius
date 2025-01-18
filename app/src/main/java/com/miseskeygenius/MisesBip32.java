@@ -20,7 +20,6 @@ import java.util.Arrays;
 import static com.bitcoinj.Bech32.encode;
 
 public class MisesBip32  {
-
       // INPUT
     private DeterministicKey masterPrivateKey;
     private String path;
@@ -28,20 +27,28 @@ public class MisesBip32  {
     private int keyTo;
     public boolean searchKeys;
 
-    public boolean inputOk()
+    public boolean inputWrong()
     {
-        return masterPrivateKey!=null & path!=null & keyFrom >=0 & keyFrom <= keyTo;
+        return !(masterPrivateKey != null & path != null & keyFrom >= 0 & keyFrom <= keyTo);
     }
 
     // is the key public or private?
     private int ppKey;
-    public static final int PRIVATE_KEY = 0;
-    public static final int PUBLIC_KEY = 1;
+    //public static final int PUBLIC_KEY = 0;
+    public static final int PRIVATE_KEY = 1;
 
-    public int coin;
+    // coins
     public static final int BITCOIN_LEGACY = 0;
     public static final int BITCOIN_SEGWIT = 1;
     public static final int ETHEREUM = 2;
+    public int coin = BITCOIN_LEGACY;
+
+    // paths
+    public static final String[][] paths = {
+            {"Bitcoin Legacy", /* also update this in activity_main.xml*/ "BIP44,BIP32,MultiBit HD,Coinomi", "m/44'/0'/0'/0/n,m/0'/0'/n',m/0'/0/n,m/44'/0'/0'/n"},
+            {"Bitcoin Segwit", "BIP84", "m/84'/0'/0'/0/n"},
+            {"Ethereum", "BIP44,EIP601", "m/44'/60'/0'/0/n,m/43'/60'/601'/n'"}
+    };
 
     // OUTPUT
     public String keyList;
@@ -192,7 +199,7 @@ public class MisesBip32  {
 
     public void processDerivation()
     {
-        if (!inputOk()) {
+        if (inputWrong()) {
             Thread.currentThread().interrupt();
             return;
         }

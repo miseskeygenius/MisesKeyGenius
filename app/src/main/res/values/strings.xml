@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">MisesKeyGenius</string>
+    <string name="show_advanced_data">Show advanced data</string>
+    <string name="no">No</string>
+    <string name="yes">Yes</string>
+    <string name="mises_key_genius">Mises Key Genius</string>
 </resources>

@@ -23,21 +23,25 @@ public class EditableSpinnerLabel extends RelativeLayout {
     private EditText editText;
     private SpinnerPlus spinner;
     private boolean isCorrect = true;
-    String[] itemValues;
-    ArrayAdapter<String> adapter;
+    private Context context;
+
+    public String[] itemValues;
 
     public EditableSpinnerLabel(Context context, AttributeSet attrs, int defStyle)
     {
         super(context, attrs, defStyle);
         init(context, attrs);
     }
+
     public EditableSpinnerLabel(Context context, AttributeSet attrs) {
         super(context, attrs);
         init(context, attrs);
     }
 
-    public void init(Context context, AttributeSet attrs)
+    private void init(Context context, AttributeSet attrs)
     {
+        this.context=context;
+
         int dp5 = dpToPx(5, context);
         int dp10 = dpToPx(10, context);
         int dp40 = dpToPx(40, context);
@@ -58,11 +62,10 @@ public class EditableSpinnerLabel extends RelativeLayout {
         spinner = new SpinnerPlus(context);
         spinner.setBackgroundResource(R.drawable.drop);
 
-        String items = typedArray.getString(R.styleable.EditableSpinnerLabel_items) ;
-        if (items != null) setItems(items, context);
-
+        // init items and values
+        String itemsString = typedArray.getString(R.styleable.EditableSpinnerLabel_items) ;
         String itemValuesString = typedArray.getString(R.styleable.EditableSpinnerLabel_itemValues) ;
-        if (itemValuesString != null) itemValues = itemValuesString.split(",");
+        if (itemsString != null && itemValuesString != null) setItems(itemsString, itemValuesString);
 
         LayoutParams spParams = new LayoutParams(dp40, dp40);
         spParams.setMargins(0,0,0,0);
@@ -160,10 +163,6 @@ public class EditableSpinnerLabel extends RelativeLayout {
         public void onNothingSelected(AdapterView<?> arg0) {}
     };
 
-    public void setLabel(String text){ textView.setText(text); }
-    public String getLabel(){
-        return textView.getText().toString();
-    }
     public void setText(String text){ editText.setText(text); }
     public String getText(){
         return editText.getText().toString();
@@ -225,10 +224,14 @@ public class EditableSpinnerLabel extends RelativeLayout {
         return id;
     }
 
-    private void setItems(String items, Context context) {
+    public void setItems(String items, String values) {
+
+        this.itemValues = values.split(",");
         String[] itemList = items.split(",");
+
+        // workaround to update item list...
         // create an adapter to describe how the items are displayed
-        adapter = new ArrayAdapter<>(context, R.layout.spinner_item, itemList);
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(context, R.layout.spinner_item, itemList);
         // set the spinners adapter to the previously created one
         spinner.setAdapter(adapter);
     }
