@@ -8,7 +8,7 @@ package com.miseskeygenius;
     Java -> Java language level migration aids -> Java 8
 
     Generate APK:
-    Build -> Generate Signed APK -> Next -> release -> select V1 and V2 signatures -> Finish
+    Build -> Generate Signed APK -> Next -> Next -> release -> select V1 and V2 signatures -> Finish
     Find APK in app/release/app-release.apk
 */
 
